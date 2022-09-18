@@ -1,0 +1,47 @@
+groupmanagement:
+    - 
+        url: http://www.facebook.com/groups/sanxuatgiaydephcm
+        number_of_posts: 20
+        member_approve: yes
+        decline_if:
+            livestream: yes
+            reshare: yes
+            have_keywords: 
+                - vay tiền
+                - ngân hàng
+                - tài khoản
+                - bán gấp
+        approve_if:
+            have_keywords:
+                - giày dép
+                - balo
+                - túi xách
+                - da bò
+                - thợ
+                - dép da
+                - đế giày
+                - dép
+                - quai
+    - 
+        url: https://www.facebook.com/groups/xuongmaygiaconghcm
+        number_of_posts: 20
+        member_approve: yes
+        decline_if:
+            livestream: yes
+            reshare: yes
+            have_keywords: 
+                - vay tiền
+                - ngân hàng
+                - tài khoản
+        approve_if:
+            have_keywords:
+                - gia công
+                - quần áo
+                - may gia công
+                - ưởng sản xuất
+                - thợ
+                - đồng phục
+                - áo thun
+                - cắt
+                - quai
+    
