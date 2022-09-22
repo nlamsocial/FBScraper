@@ -5,4 +5,9 @@ fbtool --account 0 --groupmanagement
 fbtool --account 0 --groupscheduler
 fbtool --account 0 --pagemanagement
 
+- Todo:
+create log file
+multithread, timer
+
+
 

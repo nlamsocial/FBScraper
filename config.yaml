@@ -11,9 +11,13 @@ groupmanagement:
                 - ngân hàng
                 - tài khoản
                 - bán gấp
+                - v.a.y
         approve_if:
             have_keywords:
                 - giày dép
+                - chỉ
+                - gia công
+                - xưởng sản xuất
                 - balo
                 - túi xách
                 - da bò
@@ -22,6 +26,8 @@ groupmanagement:
                 - đế giày
                 - dép
                 - quai
+                - xưởng
+                - giày
     - 
         url: https://www.facebook.com/groups/xuongmaygiaconghcm
         number_of_posts: 20
@@ -33,15 +39,20 @@ groupmanagement:
                 - vay tiền
                 - ngân hàng
                 - tài khoản
+                - v.a.y
         approve_if:
             have_keywords:
                 - gia công
                 - quần áo
                 - may gia công
-                - ưởng sản xuất
+                - xưởng sản xuất
                 - thợ
                 - đồng phục
                 - áo thun
+                - áo sơ mi
+                - hàng kỹ
                 - cắt
                 - quai
+                - vải
+                - may
     
