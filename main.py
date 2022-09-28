@@ -61,7 +61,6 @@ def run():
             fb.open_url(group_setting.url + '/pending_posts?search=&has_selection=false')
             fb.scroll(group_setting.number_of_posts)
             fb.scan_posts(group_setting)
-
     
     if(args.groupscheduler):
         print("groupscheduler now")

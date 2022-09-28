@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
 import re
+import pandas as pd
+import time
 import utils
 from utils import GroupSettingPost, PostContent, Action
 from time import sleep
@@ -14,7 +16,8 @@ CHROME_DRIVER = "E:\MyStudy\Python\FBScraper\ChromeProfiles\chromedriver.exe"
 from constants import (
     FB_XPATH_ARTICLE,
     FB_XPATH_APPROVE,
-    FB_XPATH_DECLINE
+    FB_XPATH_DECLINE,
+    FB_XPATH_POSTER
 )
 
 class FacebookScraper:
@@ -79,6 +82,10 @@ class FacebookScraper:
             try:
                 text_content = article.get_property('textContent')
                 fbpost = PostContent(article, text_content)
+                
+                #Get poster name
+                if(len(article.find_elements(By.XPATH, FB_XPATH_POSTER)) > 0):
+                    fbpost.poster = article.find_element(By.XPATH, FB_XPATH_POSTER).get_property('textContent')
     
                 #share link
                 if(len(article.find_elements(By.XPATH,".//div[@class='rdsw9yci']")) > 0):
@@ -86,59 +93,91 @@ class FacebookScraper:
                     fbpost.text_content = share_link
                     if group_setting.decline.reshare:
                         fbpost.action = Action.DECLINE
+                        fbpost.keycheck = 'reshare'
                 #text+background
                 elif(len(article.find_elements(By.XPATH,".//div[@class='hael596l alzwoclg t5n4vrf6 om3e55n1 mfclru0v']")) > 0):
                     backgroud_text = article.find_element(By.XPATH,".//div[@class='hael596l alzwoclg t5n4vrf6 om3e55n1 mfclru0v']").get_property('innerText')
                     fbpost.text_content = backgroud_text
-                    if re.search(approve_keywords, backgroud_text,re.IGNORECASE):
+                    check_approve = re.search(approve_keywords, backgroud_text,re.IGNORECASE)
+                    if check_approve:
                         fbpost.action = Action.APPROVE
-                    if re.search(decline_keywords, backgroud_text,re.IGNORECASE):
+                        fbpost.keycheck = check_approve.group()
+                        
+                    check_decline = re.search(decline_keywords, backgroud_text,re.IGNORECASE)
+                    if check_decline:
                         fbpost.action = Action.DECLINE
+                        fbpost.keycheck = check_decline.group()
                 # text large font
                 elif(len(article.find_elements(By.XPATH,".//div[@class='r227ecj6 gt60zsk1 srn514ro rl78xhln']")) > 0) :
                     large_font = article.find_element(By.XPATH,".//div[@class='r227ecj6 gt60zsk1 srn514ro rl78xhln']").get_property('innerText')
                     fbpost.text_content = large_font
-                    if re.search(approve_keywords, large_font,re.IGNORECASE):
+                    check_approve = re.search(approve_keywords, large_font,re.IGNORECASE)
+                    if check_approve:
                         fbpost.action = Action.APPROVE
-                    if re.search(decline_keywords, large_font,re.IGNORECASE):
+                        fbpost.keycheck = check_approve.group()
+                        
+                    check_decline = re.search(decline_keywords, large_font,re.IGNORECASE)
+                    if check_decline:
                         fbpost.action = Action.DECLINE
+                        fbpost.keycheck = check_decline.group()
                 #text+ 2images+ font bold
                 elif(len(article.find_elements(By.XPATH,".//div[@class='t60zsk1 ez8dtbzv r227ecj6 d2hqwtrz']")) > 0):
                     bold_font = article.find_element(By.XPATH,".//div[@class='t60zsk1 ez8dtbzv r227ecj6 d2hqwtrz']").get_property('innerText')
                     fbpost.text_content = bold_font
-                    if re.search(approve_keywords, bold_font,re.IGNORECASE):
+                    check_approve = re.search(approve_keywords, bold_font,re.IGNORECASE)
+                    if check_approve:
                         fbpost.action = Action.APPROVE
-                    if re.search(decline_keywords, bold_font,re.IGNORECASE):
+                        fbpost.keycheck = check_approve.group()
+                        
+                    check_decline = re.search(decline_keywords, bold_font,re.IGNORECASE)
+                    if check_decline:
                         fbpost.action = Action.DECLINE
+                        fbpost.keycheck = check_decline.group()
                 # mục đích : bypass NoSuchElementException
                 # kiểm tra trước tìm element nhằm tránh bị exception khi find_element
                 elif(len(article.find_elements(By.XPATH,".//div[@data-ad-comet-preview='message']")) > 0) :
                     contents = article.find_element(By.XPATH,".//div[@data-ad-comet-preview='message']").get_property('innerText')
                     fbpost.text_content = contents
-                    result = re.search(approve_keywords, contents,re.IGNORECASE)
-                    if result :
+                    check_approve = re.search(approve_keywords, contents,re.IGNORECASE)
+                    if check_approve:
                         fbpost.action = Action.APPROVE
-                    if re.search(decline_keywords, contents,re.IGNORECASE):
+                        fbpost.keycheck = check_approve.group()
+                        
+                    check_decline = re.search(decline_keywords, contents,re.IGNORECASE)
+                    if check_decline:
                         fbpost.action = Action.DECLINE
+                        fbpost.keycheck = check_decline.group()
                 else:
                     print("KO Thay")
+                    fbpost.keycheck = "ignore"
                     
                 #detect duplicate poster
-                seen = set()
-                posters = []
-                if(len(article.find_elements(By.XPATH,".//a[@class='qi72231t nu7423ey n3hqoq4p r86q59rh b3qcqh3k fq87ekyn bdao358l fsf7x5fv rse6dlih s5oniofx m8h3af8h l7ghb35v kjdc1dyq kmwttqpk srn514ro oxkhqvkx rl78xhln nch0832m cr00lzj9 rn8ck1ys s3jn8y49 icdlwmnq cxfqmxzd pbevjfx6 innypi6y']")) > 0):
-                    poster = article.find_element(By.XPATH,".//a[@class='qi72231t nu7423ey n3hqoq4p r86q59rh b3qcqh3k fq87ekyn bdao358l fsf7x5fv rse6dlih s5oniofx m8h3af8h l7ghb35v kjdc1dyq kmwttqpk srn514ro oxkhqvkx rl78xhln nch0832m cr00lzj9 rn8ck1ys s3jn8y49 icdlwmnq cxfqmxzd pbevjfx6 innypi6y']").get_property('textContent')
-                    if poster not in seen:
-                        posters.append(poster)
-                        seen.add(poster)
-                    else:
-                        #get duplicate name
-                        print("cone")
-                        fbpost.action = Action.DECLINE
+                # seen = set()
+                # posters = []
+                # if(len(article.find_elements(By.XPATH,".//a[@class='qi72231t nu7423ey n3hqoq4p r86q59rh b3qcqh3k fq87ekyn bdao358l fsf7x5fv rse6dlih s5oniofx m8h3af8h l7ghb35v kjdc1dyq kmwttqpk srn514ro oxkhqvkx rl78xhln nch0832m cr00lzj9 rn8ck1ys s3jn8y49 icdlwmnq cxfqmxzd pbevjfx6 innypi6y']")) > 0):
+                #     poster = article.find_element(By.XPATH,".//a[@class='qi72231t nu7423ey n3hqoq4p r86q59rh b3qcqh3k fq87ekyn bdao358l fsf7x5fv rse6dlih s5oniofx m8h3af8h l7ghb35v kjdc1dyq kmwttqpk srn514ro oxkhqvkx rl78xhln nch0832m cr00lzj9 rn8ck1ys s3jn8y49 icdlwmnq cxfqmxzd pbevjfx6 innypi6y']").get_property('textContent')
+                #     if poster not in seen:
+                #         posters.append(poster)
+                #         seen.add(poster)
+                #     else:
+                #         #get duplicate name
+                #         print("cone")
+                #         fbpost.action = Action.DECLINE
+                #         fbpost.keycheck = 'duplicate'
+                        
                 posts.append(fbpost)
             except Exception as e:
                 print("lỗi là: ",e)
-        
+
+        # check duplicate
+        seen = set()
+        for post in posts:
+            if post.poster not in seen:
+                seen.add(post.poster)
+            else:
+                post.action = Action.DECLINE
+                fbpost.keycheck = 'duplicate'
+        # approve now
         for post in posts:
             if post.action is Action.APPROVE:
                 print("Action là ", post.action, post.text_content)
@@ -153,6 +192,13 @@ class FacebookScraper:
                 self.driver.execute_script("arguments[0].click()", btn_decline)
                 sleep(randrange(1,5))
 
+        #Update logs
+        logs = []
+        for post in posts:
+            logcontent = utils.LogExport(post.poster, post.text_content, post.keycheck, post.action)
+            logs.append(logcontent)
+        
+        utils.update_logfile(logs, group_setting.types)
         return posts
                     
     def approve_pending_posts(self,group_setting: GroupSettingPost):

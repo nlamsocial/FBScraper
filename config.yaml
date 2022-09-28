@@ -1,7 +1,8 @@
 groupmanagement:
     - 
         url: http://www.facebook.com/groups/sanxuatgiaydephcm
-        number_of_posts: 20
+        type: dep
+        number_of_posts: 5
         member_approve: yes
         decline_if:
             livestream: yes
@@ -11,13 +12,16 @@ groupmanagement:
                 - ngân hàng
                 - tài khoản
                 - bán gấp
+                - Lãi suất
                 - v.a.y
+                - T.R.Ả G.Ó.P
+                - Hỗ trợ vốn
         approve_if:
             have_keywords:
                 - giày dép
                 - chỉ
                 - gia công
-                - xưởng sản xuất
+                - sản xuất
                 - balo
                 - túi xách
                 - da bò
@@ -30,25 +34,40 @@ groupmanagement:
                 - giày
     - 
         url: https://www.facebook.com/groups/xuongmaygiaconghcm
-        number_of_posts: 20
+        type: may
+        number_of_posts: 5
         member_approve: yes
         decline_if:
             livestream: yes
             reshare: yes
             have_keywords: 
                 - vay tiền
+                - Lãi suất
                 - ngân hàng
                 - tài khoản
                 - v.a.y
+                - T.R.Ả G.Ó.P
+                - Hỗ trợ vốn
+                - NỢ XẤU
         approve_if:
             have_keywords:
+                - tồn kho
+                - thanh lí
+                - đầm
+                - xưởng
+                - ráp sườn
+                - áo khoác
+                - nỉ
+                - hoodie
+                - dây kéo
+                - cắt
                 - gia công
                 - quần áo
                 - may gia công
                 - xưởng sản xuất
                 - thợ
                 - đồng phục
-                - áo thun
+                - thun
                 - áo sơ mi
                 - hàng kỹ
                 - cắt
