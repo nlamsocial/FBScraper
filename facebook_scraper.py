@@ -72,7 +72,7 @@ class FacebookScraper:
     
     def scan_posts(self, group_setting: GroupSettingPost):
         posts = []
-
+        seen = set()
         approve_keywords =  "(" + ")|(".join(group_setting.approve.have_keywords) + ")"
         decline_keywords =  "(" + ")|(".join(group_setting.decline.have_keywords) + ")"
         
@@ -86,7 +86,8 @@ class FacebookScraper:
                 #Get poster name
                 if(len(article.find_elements(By.XPATH, FB_XPATH_POSTER)) > 0):
                     fbpost.poster = article.find_element(By.XPATH, FB_XPATH_POSTER).get_property('textContent')
-    
+                else:
+                    continue
                 #share link
                 if(len(article.find_elements(By.XPATH,".//div[@class='rdsw9yci']")) > 0):
                     share_link = article.find_element(By.XPATH,".//div[@class='rdsw9yci']").get_property('innerText')
@@ -150,48 +151,64 @@ class FacebookScraper:
                 else:
                     print("KO Thay")
                     fbpost.keycheck = "ignore"
-                    
-                #detect duplicate poster
-                # seen = set()
-                # posters = []
-                # if(len(article.find_elements(By.XPATH,".//a[@class='qi72231t nu7423ey n3hqoq4p r86q59rh b3qcqh3k fq87ekyn bdao358l fsf7x5fv rse6dlih s5oniofx m8h3af8h l7ghb35v kjdc1dyq kmwttqpk srn514ro oxkhqvkx rl78xhln nch0832m cr00lzj9 rn8ck1ys s3jn8y49 icdlwmnq cxfqmxzd pbevjfx6 innypi6y']")) > 0):
-                #     poster = article.find_element(By.XPATH,".//a[@class='qi72231t nu7423ey n3hqoq4p r86q59rh b3qcqh3k fq87ekyn bdao358l fsf7x5fv rse6dlih s5oniofx m8h3af8h l7ghb35v kjdc1dyq kmwttqpk srn514ro oxkhqvkx rl78xhln nch0832m cr00lzj9 rn8ck1ys s3jn8y49 icdlwmnq cxfqmxzd pbevjfx6 innypi6y']").get_property('textContent')
-                #     if poster not in seen:
-                #         posters.append(poster)
-                #         seen.add(poster)
-                #     else:
-                #         #get duplicate name
-                #         print("cone")
-                #         fbpost.action = Action.DECLINE
-                #         fbpost.keycheck = 'duplicate'
+                
+                # check duplicate
+                if fbpost.poster is not None:
+                    if fbpost.poster not in seen:
+                        seen.add(fbpost.poster)
+                    else:
+                        fbpost.action = Action.DECLINE
+                        fbpost.keycheck = 'duplicate'
+                # approve now
+                print("-----------------------------------------------")
+                print("Poster: ", fbpost.poster)
+                print("keycheck: ", fbpost.keycheck)
+                print("Action: ", fbpost.action)
+                print("Content: ", fbpost.text_content)
+                if fbpost.action is Action.APPROVE:
+                    btn_approve = article.find_element(By.XPATH,FB_XPATH_APPROVE)
+                    self.driver.execute_script("arguments[0].scrollIntoView(true);", btn_approve)
+                    self.driver.execute_script("arguments[0].click()", btn_approve)
+                    sleep(randrange(1,5))
+                elif fbpost.action is Action.DECLINE:
+                    btn_decline = article.find_element(By.XPATH,FB_XPATH_DECLINE)
+                    self.driver.execute_script("arguments[0].scrollIntoView(true);", btn_decline)
+                    self.driver.execute_script("arguments[0].click()", btn_decline)
+                    sleep(randrange(1,5))
                         
                 posts.append(fbpost)
             except Exception as e:
                 print("lỗi là: ",e)
 
-        # check duplicate
-        seen = set()
-        for post in posts:
-            if post.poster not in seen:
-                seen.add(post.poster)
-            else:
-                post.action = Action.DECLINE
-                fbpost.keycheck = 'duplicate'
+        # # check duplicate
+        # seen = set()
+        # for post in posts:
+        #     if post.poster not in seen:
+        #         seen.add(post.poster)
+        #     else:
+        #         post.action = Action.DECLINE
+        #         fbpost.keycheck = 'duplicate'
         # approve now
-        for post in posts:
-            if post.action is Action.APPROVE:
-                print("Action là ", post.action, post.text_content)
-                btn_approve = post.webelement.find_element(By.XPATH,FB_XPATH_APPROVE)
-                self.driver.execute_script("arguments[0].scrollIntoView(true);", btn_approve)
-                self.driver.execute_script("arguments[0].click()", btn_approve)
-                sleep(randrange(1,5))
-            elif post.action is Action.DECLINE:
-                print("Action là ", post.action, post.text_content)
-                btn_decline = post.webelement.find_element(By.XPATH,FB_XPATH_DECLINE)
-                self.driver.execute_script("arguments[0].scrollIntoView(true);", btn_decline)
-                self.driver.execute_script("arguments[0].click()", btn_decline)
-                sleep(randrange(1,5))
-
+        # for post in posts:
+        #     print("-----------------------------------------------")
+        #     print("Poster: ", post.poster)
+        #     print("Action: ", post.action)
+        #     print("Content: ", post.text_content)
+        #     try:
+        #         if post.action is Action.APPROVE:
+        #             print("Action là ", post.action, post.text_content)
+        #             btn_approve = post.webelement.find_element(By.XPATH,FB_XPATH_APPROVE)
+        #             self.driver.execute_script("arguments[0].scrollIntoView(true);", btn_approve)
+        #             self.driver.execute_script("arguments[0].click()", btn_approve)
+        #             sleep(randrange(1,5))
+        #         elif post.action is Action.DECLINE:
+        #             print("Action là ", post.action, post.text_content)
+        #             btn_decline = post.webelement.find_element(By.XPATH,FB_XPATH_DECLINE)
+        #             self.driver.execute_script("arguments[0].scrollIntoView(true);", btn_decline)
+        #             self.driver.execute_script("arguments[0].click()", btn_decline)
+        #             sleep(randrange(1,5))
+        #     except Exception as e:
+        #         print("Approve status: ",e)
         #Update logs
         logs = []
         for post in posts:

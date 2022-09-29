@@ -2,7 +2,7 @@ groupmanagement:
     - 
         url: http://www.facebook.com/groups/sanxuatgiaydephcm
         type: dep
-        number_of_posts: 5
+        number_of_posts: 20
         member_approve: yes
         decline_if:
             livestream: yes
@@ -35,7 +35,7 @@ groupmanagement:
     - 
         url: https://www.facebook.com/groups/xuongmaygiaconghcm
         type: may
-        number_of_posts: 5
+        number_of_posts: 20
         member_approve: yes
         decline_if:
             livestream: yes
